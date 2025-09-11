@@ -14,8 +14,8 @@ struct FeedView: View {
                                 .foregroundColor(Color(red: 196/255, green: 23/255, blue: 12/255))
                                 .bold()
                             
-                            if let urlString = newsItem.imageURL,
-                               let url = URL(string: urlString) {
+                            if let urlString = newsItem.content?.image?.sizes?.L.url,
+                            let url = URL(string: urlString) {
                                 AsyncImage(url: url) { phase in
                                     switch phase {
                                     case .success(let image):

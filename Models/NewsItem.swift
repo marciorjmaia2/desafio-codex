@@ -14,28 +14,10 @@ struct NewsItem: Decodable, Identifiable, Hashable {
         content?.summary
     }
     
-    var url: URL? {
-        if let u = content?.url {
-            return URL(string: u)
-        }
-        return nil
-    }
+    var url: String?
     
     var category: String? {
         content?.chapeu?.label ?? content?.section
-    }
-    
-    var imageURL: String? {
-        if let u = content?.image?.url {
-            return u
-        }
-        if let u = content?.image?.sizes?["L"]?.url {
-            return u
-        }
-        if let anyUrl = content?.image?.sizes?.values.first?.url {
-            return anyUrl
-        }
-        return nil
     }
     
     struct NewsContent: Decodable, Hashable {
