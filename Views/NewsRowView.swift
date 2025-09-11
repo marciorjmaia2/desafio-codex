@@ -5,7 +5,7 @@ struct NewsRowView: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            if let url = item.imageURL {
+            if let url = URL(string: item.imageURL!) {
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):

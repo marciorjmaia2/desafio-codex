@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 class FeedViewModel: ObservableObject {
-    @Published var items: [[String: Any]] = []
+    @Published var feedItems: [NewsItem] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
 
@@ -10,14 +10,11 @@ class FeedViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
-            if let json = try await NewsAPI.fetchRawFeed() as? [String: Any],
-               let feed = json["feed"] as? [String: Any],
-               let falkor = feed["falkor"] as? [String: Any],
-               let rawItems = falkor["items"] as? [[String: Any]] {
-                items = rawItems
-            }
+            let response = try await NewsAPI.fetchData()
+            feedItems = response.feed?.falkor?.items ?? []
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 }
+
