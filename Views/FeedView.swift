@@ -2,44 +2,23 @@ import SwiftUI
 
 struct FeedView: View {
     @StateObject private var vm = FeedViewModel()
+    @State private var selectedURL: URL?
+    @State private var isShowingWebView = false
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                LazyVStack(alignment: .leading, spacing: 16) {
                     ForEach(vm.feedItems) { newsItem in
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(newsItem.title)
-                                .font(.headline)
-                                .foregroundColor(Color(red: 196/255, green: 23/255, blue: 12/255))
-                                .bold()
-                            
-                            if let urlString = newsItem.content?.image?.sizes?.L.url,
-                            let url = URL(string: urlString) {
-                                AsyncImage(url: url) { phase in
-                                    switch phase {
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(maxWidth: .infinity)
-                                            .frame(height: 200)
-                                            .clipped()
-                                            .cornerRadius(8)
-                                    case .failure(_):
-                                        Color.gray
-                                            .frame(height: 200)
-                                            .cornerRadius(8)
-                                    case .empty:
-                                        ProgressView()
-                                            .frame(height: 200)
-                                    @unknown default:
-                                        EmptyView()
-                                    }
-                                }
+                        Button {
+                            if let urlString = newsItem.url,
+                               let url = URL(string: urlString) {
+                                selectedURL = url
+                                isShowingWebView = true
                             }
+                        } label: {
+                            NewsRowView(newsItem: newsItem)
                         }
-                        .padding(.horizontal)
                     }
                 }
             }
@@ -57,7 +36,11 @@ struct FeedView: View {
             .task {
                 await vm.loadFeed()
             }
+            .sheet(isPresented: $isShowingWebView) {
+                if let url = selectedURL {
+                    WebView(url: url)
+                }
+            }
         }
     }
 }
-

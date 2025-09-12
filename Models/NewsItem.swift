@@ -14,11 +14,11 @@ struct NewsItem: Decodable, Identifiable, Hashable {
         content?.summary
     }
     
-    var url: String?
-    
-    var category: String? {
-        content?.chapeu?.label ?? content?.section
+    var url: String? {
+        content?.url
     }
+    
+    var category: String? { nil }
     
     struct NewsContent: Decodable, Hashable {
         let chapeu: ContentLabel?
