@@ -11,4 +11,5 @@ struct Feed: Decodable {
 
 struct Falkor: Decodable {
     let items: [NewsItem]?
+    let nextPage: Int?
 }

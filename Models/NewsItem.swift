@@ -18,7 +18,10 @@ struct NewsItem: Decodable, Identifiable, Hashable {
         content?.url
     }
     
-    var category: String? { nil }
+    var category: String? {
+        content?.chapeu?.label ?? content?.section
+    }
+
     
     struct NewsContent: Decodable, Hashable {
         let chapeu: ContentLabel?

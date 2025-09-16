@@ -5,10 +5,17 @@ struct NewsRowView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if let category = newsItem.category {
+                Text(category)
+                    .font(.caption)
+                    .foregroundColor(.black)
+            }
+            
             Text(newsItem.title)
                 .font(.headline)
                 .foregroundColor(Color(red: 196/255, green: 23/255, blue: 12/255))
                 .bold()
+
             
             if let urlString = newsItem.content?.image?.sizes?.L.url,
                let url = URL(string: urlString) {
@@ -17,11 +24,12 @@ struct NewsRowView: View {
                     case .success(let image):
                         image
                             .resizable()
-                            .scaledToFill()
+                            .scaledToFit()
                             .frame(maxWidth: .infinity)
                             .frame(height: 200)
                             .clipped()
                             .cornerRadius(8)
+                            .padding(.vertical, 8)
                     case .failure(_):
                         Color.gray
                             .frame(height: 200)
@@ -35,23 +43,22 @@ struct NewsRowView: View {
                 }
             }
             
+            if let summary = newsItem.summary {
+                Text(summary)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                    .lineLimit(3)
+            }
+            
             HStack {
                 if let metadata = newsItem.metadata {
                     Text(metadata)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
-                if let category = newsItem.category {
-                    Text(category)
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                        .padding(.leading, 4)
-                        .padding(.bottom, 4)
-                }
             }
         }
-        .padding(.horizontal)
+        .padding(10)
     }
 }
 

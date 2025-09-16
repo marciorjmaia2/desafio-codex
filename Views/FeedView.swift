@@ -1,26 +1,38 @@
 import SwiftUI
 
 struct FeedView: View {
-    @StateObject private var vm = FeedViewModel()
+    @StateObject var vm: FeedViewModel
     @State private var selectedURL: URL?
-    @State private var isShowingWebView = false
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
-                    ForEach(vm.feedItems) { newsItem in
+            List {
+                ForEach(vm.feedItems.indices, id: \.self) { index in
+                    let newsItem = vm.feedItems[index]
+                    
+                    if let urlString = newsItem.url,
+                       let url = URL(string: urlString) {
                         Button {
-                            if let urlString = newsItem.url,
-                               let url = URL(string: urlString) {
-                                selectedURL = url
-                                isShowingWebView = true
-                            }
+                            selectedURL = url
                         } label: {
                             NewsRowView(newsItem: newsItem)
                         }
+                        .buttonStyle(.plain)
+                    }
+                    
+                    if index == vm.feedItems.count - 1 {
+                        ProgressView()
+                            .onAppear {
+                                Task {
+                                    await vm.loadMore()
+                                }
+                            }
                     }
                 }
+            }
+            .listStyle(.plain)
+            .refreshable {
+                await vm.loadFeed()
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
@@ -36,11 +48,12 @@ struct FeedView: View {
             .task {
                 await vm.loadFeed()
             }
-            .sheet(isPresented: $isShowingWebView) {
-                if let url = selectedURL {
-                    WebView(url: url)
-                }
+            .navigationDestination(item: $selectedURL) { url in
+                WebView(url: url)
+                    .navigationTitle("Notícia")
+                    .navigationBarTitleDisplayMode(.inline)
             }
         }
     }
 }
+
