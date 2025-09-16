@@ -7,7 +7,8 @@ class FeedViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let baseURL: String
-    private var nextPage: Int? = 1 
+    private var nextPage: Int? = 1
+    private var currentOfferID: String?
 
     init(feedURL: String) {
         self.baseURL = feedURL
@@ -16,6 +17,7 @@ class FeedViewModel: ObservableObject {
     func loadFeed() async {
         nextPage = 1
         feedItems.removeAll()
+        currentOfferID = nil
         await loadMore()
     }
 
@@ -25,13 +27,22 @@ class FeedViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        var urlString = baseURL
-        if page > 1 {
-            urlString += "?page=\(page)"
+        var urlString: String
+
+        if page == 1 {
+            urlString = baseURL
+        } else if let oferta = currentOfferID {
+            urlString = "https://native-leon.globo.com/feed/page/g1/\(oferta)/\(page)"
+        } else {
+            return
         }
 
         do {
             let response = try await NewsAPI.fetchData(from: urlString)
+            if page == 1 {
+                currentOfferID = response.feed?.oferta
+            }
+
             let newItems = (response.feed?.falkor?.items ?? [])
                 .filter { $0.type == "basico" || $0.type == "materia" }
 
@@ -42,3 +53,4 @@ class FeedViewModel: ObservableObject {
         }
     }
 }
+

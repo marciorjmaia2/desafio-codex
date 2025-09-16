@@ -10,12 +10,12 @@ struct ContentView: View {
             
             FeedView(vm: FeedViewModel(feedURL: "https://native-leon.globo.com/feed/https://g1.globo.com/economia/agronegocios"))
                 .tabItem {
-                    Label("Agro", systemImage: "leaf")
+                    Label("Agro", systemImage: "tree")
                 }
             
             MenuView()
                 .tabItem {
-                    Label("Menu", systemImage: "list.bullet")
+                    Label("Menu", systemImage: "line.3.horizontal")
                 }
         }
     }
