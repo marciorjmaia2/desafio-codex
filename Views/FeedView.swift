@@ -1,31 +1,30 @@
 import SwiftUI
 
 struct FeedView: View {
-    @StateObject var vm: FeedViewModel
-    @State private var selectedURL: URL?
+    @StateObject var vm: FeedViewModel //conecta feedViewModel
+    @State private var selectedURL: URL? //guarda url
     
     var body: some View {
-        NavigationStack {
+        NavigationStack { //permite navegar novas telas
             List {
-                ForEach(vm.feedItems.indices, id: \.self) { index in
+                ForEach(vm.feedItems.indices, id: \.self) { index in //percorre a lista
                     let newsItem = vm.feedItems[index]
                     
-                    if let urlString = newsItem.url,
+                    if let urlString = newsItem.url, //pega urlString e tenta converter, se for valido cria o botao
                        let url = URL(string: urlString) {
                         Button {
-                            selectedURL = url
+                            selectedURL = url //armazena URL e dispara WebView
                         } label: {
-                            NewsRowView(newsItem: newsItem)
+                            NewsRowView(newsItem: newsItem) //Exibe o conteúdo da notícia com NewsRowView
                         }
                         .buttonStyle(.plain)
                     }
                     
-                    if index == vm.feedItems.count - 1 {
-                        ProgressView()
-                            .onAppear {
-                                Task {
-                                    await vm.loadMore()
-                                }
+                    if index == vm.feedItems.count - 1 { //quando chega o ultimo item da lista
+                        ProgressView() //mostra o carregando
+                            .task(id: vm.feedItems.count) {
+                                await vm.loadMore()
+                            }
                             }
                     }
                 }
@@ -45,7 +44,7 @@ struct FeedView: View {
                         .padding(.leading, 8)
                 }
             }
-            .task {
+            .task { //ciclo de vida da View
                 await vm.loadFeed()
             }
             .navigationDestination(item: $selectedURL) { url in
@@ -55,5 +54,4 @@ struct FeedView: View {
             }
         }
     }
-}
 

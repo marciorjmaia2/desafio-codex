@@ -6,10 +6,10 @@ struct MenuView: View {
     var body: some View {
         NavigationStack {
             List(vm.menuItems) { item in
-                if let url = URL(string: item.url) {
+                if let url = URL(string: item.url) { //verifica URL valida
                     NavigationLink {
-                        WebView(url: url)
-                            .navigationTitle(item.title.capitalized)
+                        WebView(url: url) //abre uma WebView
+                            .navigationTitle(item.title.capitalized) //titulo primeira letra maiuscula
                             .navigationBarTitleDisplayMode(.inline)
                     } label: {
                         Text(item.title.capitalized)

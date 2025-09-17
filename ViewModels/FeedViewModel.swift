@@ -7,10 +7,10 @@ class FeedViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let baseURL: String
-    private var nextPage: Int? = 1
+    private var nextPage: Int = 1
     private var currentOfferID: String?
 
-    init(feedURL: String) {
+    init(feedURL: String) { //inicializador
         self.baseURL = feedURL
     }
 
@@ -22,8 +22,9 @@ class FeedViewModel: ObservableObject {
     }
 
     func loadMore() async {
-        guard let page = nextPage, !isLoading else { return }
-
+        guard !isLoading else { return } //guarda numero da pagina
+        let page = nextPage
+        
         isLoading = true
         defer { isLoading = false }
 
@@ -38,7 +39,7 @@ class FeedViewModel: ObservableObject {
         }
 
         do {
-            let response = try await NewsAPI.fetchData(from: urlString)
+            let response = try await NewsAPI.fetchData(from: urlString) //busca dados
             if page == 1 {
                 currentOfferID = response.feed?.oferta
             }
@@ -47,7 +48,7 @@ class FeedViewModel: ObservableObject {
                 .filter { $0.type == "basico" || $0.type == "materia" }
 
             feedItems.append(contentsOf: newItems)
-            nextPage = response.feed?.falkor?.nextPage
+            nextPage = nextPage + 1  //busca a proxima pagina
         } catch {
             errorMessage = error.localizedDescription
         }
